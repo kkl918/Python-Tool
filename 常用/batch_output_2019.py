@@ -134,8 +134,8 @@ def export():
                         #os.mkdir(path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_1 + '\\' + i)
                         zf.extractall(path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_1 + '\\' + i + '\\')
                         print('[OK] unzip tile')
-            else :
-                print("chunk.label wrong!!")
+            # else :
+                # print("chunk.label wrong!!")
     
 def main():
     export()
