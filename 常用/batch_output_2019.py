@@ -69,7 +69,8 @@ def export():
                     kmz    = path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_1 + '\\' + i + '.kmz'
                     
                     # 1.7.DSM_數值地表模型
-                    dsm    = path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_7 + '\\' + i + '.tif'
+                    dsm97    = path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_7 + '\\' + i + '_tw97.tif'
+                    dsm84    = path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_7 + '\\' + i + '_wgs84.tif'
                     
                     # 1.8.3DModel_3D模型
                     obj    = path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_8 + '\\' + 'model' + '.obj'
@@ -92,7 +93,8 @@ def export():
                     print('[OK] export tile.')
                     
                     # DSM
-                    chunk.exportDem(path=dsm,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= tw97,nodata=-32767)
+                    chunk.exportDem(path=dsm97,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= tw97,nodata=-32767)
+                    chunk.exportDem(path=dsm84,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= ws84,nodata=-32767)
                     print('[OK] export dsm.')            
                     
                     #三維模型 OBJ

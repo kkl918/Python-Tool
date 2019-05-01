@@ -3,13 +3,18 @@ import shutil, pathlib, os, webbrowser, glob
 from tkinter import *
 from tkinter import messagebox
 from tkinter.filedialog import *
-#from dirsync import sync
 import pandas as pd
+
+import osr, os, affine, time
+import numpy as np
+from matplotlib import pyplot as plt
+from gdalconst import *
+from osgeo import gdal
 
 title_bar = 'ob tools'
 
 window = Tk()
-window.geometry("300x25")
+window.geometry("400x25")
 window.title(title_bar)
 #window.withdraw()
 
@@ -19,8 +24,8 @@ fuc_title = { '1':'選擇資料夾',
               '2':'執行轉換',
               '3':'橢球高',
               '4':'正高',
-              '5':'EGNSS(2)',
-              '6':'結束',
+              '5':'KML_Add',
+              '6':'Log2tw97',
               '7':'空',
               '8':'空',
               '9':'空',
@@ -33,7 +38,6 @@ src_name = ''
 def src():
     src_name = askopenfilename()
     print(src_name)
-
 
 def dst():
     dst_name = askdirectory()
@@ -144,7 +148,64 @@ def do_dms2dd():
                 output.write(dms2dd(i[:-2]))    
     output.close()
     open_url()
+
+
+def get_lon_lat(file_in, file_out, data): 
+    with open(file_in, 'r', encoding='utf8') as origin:
+        with open(file_out, 'w', encoding='utf8') as out:
+            num = 0
+            for line in origin.readlines():  
+                if num == 1 :
+                    out.write('\t\t\t\t\t\t\t')
+                    for j in line.split():
+                            if j != '</LineString>':
+                                xlon = float(j.split(',')[0])
+                                xlat = float(j.split(',')[1])
+                                print(xlon, xlat)
+                                h    = str(retrieve_pixel_value((xlon, xlat), data)+0.7)        
+                                out.write(j.split(',')[0] + ',' + j.split(',')[1] + ',' + h + ' ')  
+                                kml.append(j.split(',')[0] + ',' + j.split(',')[1] + ',' + h + '\n')
+                    out.write('</LineString>')
+                    num = 0
+                else:                   
+                    if line.find('<outline>0</outline>') > 0:
+                        pass
+                    else:
+                        out.write(line) 
+                
+                if line.find('<coordinates>') > 0:
+                    num = 1
+    print('[OK] write kml.\n')
+
+def retrieve_pixel_value(geo_coord, data_source):
+    """Return floating-point value that corresponds to given point."""
+    x, y = geo_coord[0], geo_coord[1]
+    forward_transform =  affine.Affine.from_gdal(*data_source.GetGeoTransform())
+    reverse_transform =  ~forward_transform
+    px, py = reverse_transform * (x, y)
+    px, py = int(px + 0.5), int(py + 0.5)
+    pixel_coord = px, py
+    data_array = np.array(data_source.GetRasterBand(1).ReadAsArray())
+    # i = data_array[0]
+    # j = data_array[1]
+    return(data_array[pixel_coord[1]][pixel_coord[0]])
+
+def funtion_kml_add_height():    
+      
+    kml_file   = askopenfilename()
+    kml_out    = kml_file[:-4] + '_addHeight' + kml_file[-4:]
+    dem_file   = askopenfilename()
+    start_time = time.time() 
+    data  = gdal.Open(dem_file, GA_ReadOnly)
+    array = get_lon_lat(kml_file, kml_out, data)
+
     
+        
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+
+
+# init condition    
 line_1 = 0
 line_2 = 100
 
@@ -157,12 +218,10 @@ fuc_2  = Button(window, width = length, height = height, text = fuc_title['3'], 
 
 fuc_3  = Button(window, width = length, height = height, text = fuc_title['4'], command = egnss_8).place(x = 200,y = line_1)
 
-# fuc_4  = Button(window, width = length, height = height, text = fuc_title['4'], command = egnss_8).place(x = 300,y = line_1)
+fuc_4  = Button(window, width = length, height = height, text = fuc_title['5'], command = funtion_kml_add_height).place(x = 300,y = line_1)
 
 # fuc_5  = Button(window, width = length, height = height, text = fuc_title['5'], command = egnss_2).place(x = 400,y = line_1)
 
 # fuc_6  = Button(window, width = length, height = height, text = fuc_title['6'], command = quit).place(x = 500,y = line_1)
 
-# do_dms2dd()
-# open_url()
 window.mainloop()
