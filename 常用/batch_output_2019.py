@@ -153,9 +153,15 @@ def export():
                     chunk.exportOrthomosaic(tile,format=PhotoScan.RasterFormatXYZ,image_format=PhotoScan.ImageFormatPNG,raster_transform=PhotoScan.RasterTransformNone,projection=ws84,write_kml=True)
                     print('[OK] export tile.')
                     
+<<<<<<< HEAD
                     ## DSM
                     chunk.exportDem(path=dsm97,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= tw97, nodata=-32767)
                     chunk.exportDem(path=dsm84,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= ds84, nodata=-32767)
+=======
+                    # DSM
+                    chunk.exportDem(path=dsm97,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= tw97,nodata=-32767)
+                    chunk.exportDem(path=dsm84,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= ws84,nodata=-32767)
+>>>>>>> 6d81e48c39434ec90093542561818cd5471f59c6
                     print('[OK] export dsm.')            
                     
                     ##三維模型 OBJ
