@@ -1,7 +1,8 @@
 import os, sys
 from ftplib import FTP
 
-path = r'\\140.116.228.155\geodac_uav\2019'
+path_155 = r'\\140.116.228.155\geodac_uav\2019'
+path_174_model = r'\\140.116.228.174\geodac_data_test\RAW\RSImage\UAV\3DModel'
 
 info  = ['140.116.249.139','geodac','rsej0hk45j/vup','/TCGEO/2019']
 ftp   = FTP(info[0])
@@ -33,29 +34,39 @@ def uploadThis(path):
             uploadThis(path + r'\{}'.format(f))
     ftp.cwd('..')
     os.chdir('..')
-    
-error      = []
-ready2send = []
-print('[num]\t [name]')
-for i in os.listdir(path)[4:-2]:
-    model_folder  = path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_8
-    target = os.path.join(model_folder,'upload',i)
-    if os.listdir(target) and os.listdir(os.path.join(target,'othro')):
-        print(len(os.listdir(os.path.join(target,'othro'))), '\t', i[:40])
-        ready2send.append(os.path.join(path,i))
-    elif not os.listdir(os.path.join(target,'othro')):
-        error.append(i)
+
+
+for dir in os.listdir(path_174_model):
+    src = os.path.join(path_174_model, dir)
+    dst = r'/TCGEO/2019' + '/' + dir + '/model'
+    if dir in ftp_list: 
+        ftp.cwd(dst)
+        if len(os.listdir(src)) > 0:
+            print(os.listdir(src),dst)
+            uploadThis(src)
+
+# error      = []
+# ready2send = []
+# print('[num]\t [name]')
+# for i in os.listdir(path)[4:-2]:
+    # model_folder  = path + '\\' + i + '\\' + dir_1 + '\\'+ dir_1_8
+    # target = os.path.join(model_folder,'upload',i)
+    # if os.listdir(target) and os.listdir(os.path.join(target,'othro')):
+        # print(len(os.listdir(os.path.join(target,'othro'))), '\t', i[:40])
+        # ready2send.append(os.path.join(path,i))
+    # elif not os.listdir(os.path.join(target,'othro')):
+        # error.append(i)
 
 
 # check error
-if len(error) != 0:
-    print('\n[Error]')
-    for i in error:
-        print(i[:40])
-print('\n\n[Excute]')
-for i in ready2send:
-    if os.path.isdir(i):
-        print(i)
-        uploadThis(i)
-    else:
-        print('[Error]:',i)
+# if len(error) != 0:
+    # print('\n[Error]')
+    # for i in error:
+        # print(i[:40])
+# print('\n\n[Excute]')
+# for i in ready2send:
+    # if os.path.isdir(i):
+        # print(i)
+        # uploadThis(i)
+    # else:
+        # print('[Error]:',i)

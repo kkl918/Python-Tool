@@ -10,8 +10,10 @@ from subprocess import PIPE
 info  = ['140.116.249.139','geodac','rsej0hk45j/vup','/TCGEO/2019']
 ftp   = FTP(info[0])
 ftp.login(info[1], info[2])
+ftp.encoding='UTF-8'
 ftp.cwd(info[3])
 ftp_list = ftp.nlst(info[3])
+
 
 url_front = 'https://geodac.ncku.edu.tw/TCGEO/2019/'
 path      = r'\\140.116.228.155\geodac_uav\2019'

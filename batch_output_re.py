@@ -20,12 +20,12 @@ dir  = r'C:\Users\RSLAB\Desktop\dir\\'
 dir_1   = '1.測繪產品'
 dir_1_1 = '1.1.Ortho_正射影像(包含附加檔)'
 dir_1_2 = '1.2.OrigPhoto_原始照片'
-dir_1_3 ='1.3.PrecEval_精度評估報告'
-dir_1_4 ='1.4.ContCoor_控制點座標)'
-dir_1_5 ='1.5.ContPhoto_控制點照片'
-dir_1_6 ='1.6.FlyRec_飛行記錄'
-dir_1_7 ='1.7.DSM_數值地表模型'
-dir_1_8 ='1.8.3DModel_3D模型'
+dir_1_3 = '1.3.PrecEval_精度評估報告'
+dir_1_4 = '1.4.ContCoor_控制點座標)'
+dir_1_5 = '1.5.ContPhoto_控制點照片'
+dir_1_6 = '1.6.FlyRec_飛行記錄'
+dir_1_7 = '1.7.DSM_數值地表模型'
+dir_1_8 = '1.8.3DModel_3D模型'
 
 
 print("\n- - - - - - - - Script started - - - - - - - - \n")

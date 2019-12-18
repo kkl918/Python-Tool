@@ -5,7 +5,7 @@
 ## 專案CHUNK名字必須與155上資料夾一致 ##
 ########################################
 import os, sys, zipfile, pathlib,  datetime, shutil, subprocess
-import PhotoScan, chardet
+import Metashape
 from tkinter.filedialog import *
 from bs4 import BeautifulSoup
 from subprocess import PIPE
@@ -15,10 +15,10 @@ from xml.dom import minidom
 
 
 # 前置設定參數
-tw97   = PhotoScan.CoordinateSystem("EPSG::3826")
-ws84   = PhotoScan.CoordinateSystem("EPSG::3857")
-ds84  = PhotoScan.CoordinateSystem("EPSG::4326") 
-crs    = PhotoScan.CoordinateSystem('LOCAL_CS["Local CS",LOCAL_DATUM["Local Datum",0],UNIT["metre",1]]')
+tw97   = Metashape.CoordinateSystem("EPSG::3826")
+ws84   = Metashape.CoordinateSystem("EPSG::3857")
+ds84  = Metashape.CoordinateSystem("EPSG::4326") 
+crs    = Metashape.CoordinateSystem('LOCAL_CS["Local CS",LOCAL_DATUM["Local Datum",0],UNIT["metre",1]]')
 
 
 path = r'\\140.116.228.155\geodac_uav\2019'
@@ -95,7 +95,7 @@ def create_xml(i, wgs84):
 # 自動產生 TIFF、KMZ、TILE、MODEL(含解壓縮及中心座標檔案)
 def export():
     
-    for chunk in PhotoScan.app.document.chunks:
+    for chunk in Metashape.app.document.chunks:
         for i in os.listdir(path):
             # print('chunk name: ' + chunk.label)
             # i為資料夾名稱 == chunk名字
@@ -130,7 +130,7 @@ def export():
                        # if not marker.position:
                           # continue
                        # v_t = T.mulp(marker.position)
-                       # chunk.crs = PhotoScan.CoordinateSystem("EPSG::4326")
+                       # chunk.crs = Metashape.CoordinateSystem("EPSG::4326")
                        # v_out = chunk.crs.project(v_t)
                        # f.write(marker.label + ',' + str(v_out[0]) + ',' + str(v_out[1]) + ',' + str(v_out[2]) + '\n')
                        # print(marker.label + ',' + str(v_out[0]) + ',' + str(v_out[1]) + ',' + str(v_out[2]) + '\n')
@@ -138,11 +138,11 @@ def export():
                     
                     
                     ## 正射影像 TIFF
-                    chunk.exportOrthomosaic(othro,image_format=PhotoScan.ImageFormatTIFF,projection=tw97,raster_transform=PhotoScan.RasterTransformNone,write_kml=True,write_world=True,white_background=False)
+                    chunk.exportOrthomosaic(othro,image_format=Metashape.ImageFormatTIFF,projection=tw97,raster_transform=Metashape.RasterTransformNone,write_kml=True,write_world=True,white_background=False)
                     print('[OK] export othro.')
                     
                     ## 正射影像 KMZ
-                    chunk.exportOrthomosaic(kmz  ,format=PhotoScan.RasterFormatKMZ,raster_transform=PhotoScan.RasterTransformNone,write_kml=True,write_world=True)
+                    chunk.exportOrthomosaic(kmz  ,format=Metashape.RasterFormatKMZ,raster_transform=Metashape.RasterTransformNone,write_kml=True,write_world=True)
                     print('[OK] export kmz.')
 
                     ## 報告
@@ -150,20 +150,20 @@ def export():
                     print('[OK] export report.')
 
                     ## 圖專
-                    chunk.exportOrthomosaic(tile,format=PhotoScan.RasterFormatXYZ,image_format=PhotoScan.ImageFormatPNG,raster_transform=PhotoScan.RasterTransformNone,projection=ws84,write_kml=True)
+                    chunk.exportOrthomosaic(tile,format=Metashape.RasterFormatXYZ,image_format=Metashape.ImageFormatPNG,raster_transform=Metashape.RasterTransformNone,projection=ws84,write_kml=True)
                     print('[OK] export tile.')
                     
                     ## DSM
-                    chunk.exportDem(path=dsm97,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= tw97, nodata=-32767)
-                    chunk.exportDem(path=dsm84,format=PhotoScan.RasterFormatTiles,image_format=PhotoScan.ImageFormatTIFF,projection= ds84, nodata=-32767)
+                    chunk.exportDem(path=dsm97,format=Metashape.RasterFormatTiles,image_format=Metashape.ImageFormatTIFF,projection= tw97, nodata=-32767)
+                    chunk.exportDem(path=dsm84,format=Metashape.RasterFormatTiles,image_format=Metashape.ImageFormatTIFF,projection= ds84, nodata=-32767)
                     print('[OK] export dsm.')            
                     
                     ##三維模型 OBJ
-                    chunk.exportModel(obj   , binary=False, precision=6, texture_format=PhotoScan.ImageFormatJPEG, texture=True, normals=False, colors=False, cameras=False, udim=False, strip_extensions=False, format=PhotoScan.ModelFormatOBJ, projection=crs)
+                    chunk.exportModel(obj   , binary=False, precision=6, texture_format=Metashape.ImageFormatJPEG, texture=True, normals=False, colors=False, cameras=False, udim=False, strip_extensions=False, format=Metashape.ModelFormatOBJ, projection=crs)
                     print('[OK] export obj.')
 
                     ##三維模型 KMZ
-                    chunk.exportModel(kmz_3d   , binary=False, precision=6, texture_format=PhotoScan.ImageFormatJPEG, texture=True, normals=False, colors=False, cameras=False, udim=False, strip_extensions=False, format=PhotoScan.ModelFormatKMZ, projection=crs)
+                    chunk.exportModel(kmz_3d   , binary=False, precision=6, texture_format=Metashape.ImageFormatJPEG, texture=True, normals=False, colors=False, cameras=False, udim=False, strip_extensions=False, format=Metashape.ModelFormatKMZ, projection=crs)
                     print('[OK] export kmz_3d.')
 
                     ## 解壓縮KMZ_3D
@@ -247,11 +247,18 @@ def export():
                         ## move tran3d from 174 to 155
                         after_tran = path_174 + '\\' + nowtime + '\\' + 'Batchedmodel'
                         dst_155    = path     + '\\' + i       + '\\' + dir_1           + '\\'+ dir_1_8 + '\\' + 'tran3d'
-                        shutil.copytree(after_tran, dst_155)
+                        if os.path.isdir(dst_155):
+                            shutil.rmtree(dst_155)
+                            shutil.copytree(after_tran, dst_155)
+                        else:
+                            shutil.copytree(after_tran, dst_155)
                         
-                        ## D槽也一份 
-                        shutil.copytree(after_tran, out_model)
-                        
+                        ## D槽也一份
+                        if os.path.isdir(out_model):
+                            shutil.rmtree(out_model)                      
+                            shutil.copytree(after_tran, out_model)
+                        else:
+                            shutil.copytree(after_tran, out_model)
             
                         ## 自動產生xml
                         create_xml(i, wgs84)

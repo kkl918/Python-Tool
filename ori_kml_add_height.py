@@ -2,6 +2,16 @@ import osr, os, affine, time
 from gdalconst import *
 from osgeo import gdal
 
+def path_join(str):
+    py_path    = os.path.dirname(os.path.realpath(__file__))
+    abs_path = os.path.join(py_path,str) 
+    if os.path.isfile(abs_path):
+        return abs_path 
+    else:
+        print('[Alarm] File not exist:{}\n'.format(abs_path ))
+        return abs_path 
+
+
 def retrieve_pixel_value(geo_coord, data_source):
     """Return floating-point value that corresponds to given point."""
     x, y = geo_coord[0], geo_coord[1]
@@ -17,7 +27,8 @@ def retrieve_pixel_value(geo_coord, data_source):
 
     
 # retuen lon list and lat list from kml file
-def get_lon_lat(file_in, file_out, data): 
+def get_lon_lat(file_in, file_out, data):
+    kml = []   
     with open(file_in, 'r', encoding='utf8') as origin:
         with open(file_out, 'w', encoding='utf8') as out:
             num = 0
@@ -40,7 +51,51 @@ def get_lon_lat(file_in, file_out, data):
                 if line.find('<coordinates>') > 0:
                     num = 1
     print('[OK] write kml.\n')
+    return kml
 
+def pixelcoord(x, y):
+    """Returns coordinates X Y from pixel"""
+    xp = a * x + b * y + minX
+    yp = d * x + e * y + minY
+    return xp, yp
+
+def print_dem_value(file):
+    data = gdal.Open(file, GA_ReadOnly)
+    raster  = data.GetRasterBand(1)
+    width   = data.RasterXSize
+    height  = data.RasterYSize
+    gt      = data.GetGeoTransform()
+    minX = gt[0]
+    minY = gt[3] + width*gt[4] + height*gt[5] 
+    maxX = gt[0] + width*gt[1] + height*gt[2]
+    maxY = gt[3] 
+
+    # print ("the domain :" , "[" ,minX,";",maxX,"]","[", minY,";",maxY ,"]")
+
+    # showing a 2D image of the topo
+    # plt.imshow(data, cmap='gist_earth',extent=[minx, maxx, miny, maxy])
+    # plt.show()
+
+    # elevation 2D numpy array
+    elevation = raster.ReadAsArray()
+
+    a = gt[1]
+    b = gt[2]
+    d = gt[4]
+    e = gt[5]  
+      
+    for i in range(height):
+      for j in range(width):
+         xp = a * i + b * j + minX
+         yp = d * i + e * j + minY
+         if elevation[i][j] != -32767:
+            print(xp , yp, elevation[i][j])
+
+def write_it(file, list):
+    with open(file, 'w') as f:
+        for line in list:          
+            f.write(line)
+    
 
 def main():    
     start_time = time.time()   
